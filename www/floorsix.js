@@ -25,6 +25,7 @@
 
   var _isInitialized = false;
   var ratio = 1;
+  var output = document.createElement("div");
 
   floorsix.app = function(cfg) {
     _isInitialized = true;
@@ -66,6 +67,12 @@
       width: canvas.width / ratio,
       height: canvas.height / ratio
     } : null;
+  }
+
+  floorsix.log = function(str) {
+    var line = document.createElement('div');
+    line.textContent = str;
+    output.appendChild(line);
   }
 
   floorsix.math = {};
@@ -153,6 +160,19 @@
     });
 
     setInterval(checkForRouteChange, 100);
+
+    if (floorsix.search().debug) {
+      output.style.position = "fixed";
+      output.style.zIndex = "100";
+      output.style.left = "0";
+      output.style.right = "0";
+      output.style.top = "0";
+      output.style.height = "15%";
+      output.style.overflowY = "scroll";
+      output.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+      output.style.color = "#ffffff";
+      document.body.appendChild(output);
+    }
 
     _requestAnimationFrame(animate);
   });

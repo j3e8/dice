@@ -23,8 +23,20 @@ floorsix.controller("/spinner", function() {
   var currentSpin = 0;
   var totalSpin = 0;
 
-  var settingsImage = FImage.create('www/images/settings.svg');
-  var doneImage = FImage.create('www/images/done.svg');
+  var canvasSize = floorsix.getCanvasSize();
+  var backButton = FImageButton.create('www/images/back.svg', { x: canvasSize.width * 0.02, y: canvasSize.width * 0.02 }, { width: canvasSize.width * 0.1 });
+  var iconSize = Math.min(canvasSize.width, canvasSize.height) * 0.2;
+  var settingsButton = FImageButton.create('www/images/settings.svg', { x: canvasSize.width / 2 - iconSize / 2, y: canvasSize.height - iconSize * 1.1 }, { width: iconSize });
+  var doneButton = FImageButton.create('www/images/done.svg', { x: canvasSize.width / 2 - iconSize / 2, y: canvasSize.height - iconSize * 1.1 }, { width: iconSize });
+
+  var spinnerRadius = Math.min(canvasSize.width, canvasSize.height) * 0.9 / 2;
+  var sliderHeight = canvasSize.height * 0.05;
+  var sliderY = canvasSize.height * 0.1 + spinnerRadius * 0.8 * 2 + canvasSize.height * 0.1;
+  var hueSlider = FGradientSlider.create({ x: canvasSize.width * 0.05, y: sliderY }, { width: canvasSize.width * 0.9, height: sliderHeight }, FGradientSlider.Types.HUE);
+    sliderY += sliderHeight * 1.5;
+  var lightnessSlider = FGradientSlider.create({ x: canvasSize.width * 0.05, y: sliderY }, { width: canvasSize.width * 0.9, height: sliderHeight }, FGradientSlider.Types.LIGHTNESS);
+    sliderY += sliderHeight * 1.5;
+  var saturationSlider = FGradientSlider.create({ x: canvasSize.width * 0.05, y: sliderY }, { width: canvasSize.width * 0.9, height: sliderHeight }, FGradientSlider.Types.SATURATION);
 
   function animate(elapsedMs) {
     if (phase == SPINNING) {
@@ -50,22 +62,22 @@ floorsix.controller("/spinner", function() {
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    var radius = spinnerRadius;
     var cx = canvas.width * 0.5;
     var cy = canvas.height * 0.4;
-    var spinnerRadius = Math.min(canvas.width, canvas.height) * 0.9 / 2;
     if (mode == MODE_EDIT) {
-      spinnerRadius *= 0.8;
-      cy = canvas.height * 0.05 + spinnerRadius;
+      radius *= 0.8;
+      cy = canvas.height * 0.05 + radius;
     }
-    var labelInsidePadding = spinnerRadius * 0.25;
-    var labelOutsidePadding = spinnerRadius * 0.1;
-    var labelFontSize = spinnerRadius * 0.6;
+    var labelInsidePadding = radius * 0.25;
+    var labelOutsidePadding = radius * 0.1;
+    var labelFontSize = radius * 0.6;
 
     // determine font size
     ctx.font = labelFontSize + "px Avenir";
     choices.forEach(function(choice) {
       var size = ctx.measureText(choice.value);
-      var allowedWidth = spinnerRadius - (labelInsidePadding + labelOutsidePadding);
+      var allowedWidth = radius - (labelInsidePadding + labelOutsidePadding);
       if (size.width > allowedWidth) {
         labelFontSize *= allowedWidth / size.width;
       }
@@ -88,8 +100,8 @@ floorsix.controller("/spinner", function() {
       ctx.fillStyle = choice.color;
       ctx.beginPath();
       ctx.moveTo(0, 0);
-      ctx.lineTo(spinnerRadius, 0);
-      ctx.arc(0, 0, spinnerRadius, 0, choiceAngleSize);
+      ctx.lineTo(radius, 0);
+      ctx.arc(0, 0, radius, 0, choiceAngleSize);
       ctx.lineTo(0, 0);
       ctx.fill();
 
@@ -98,7 +110,7 @@ floorsix.controller("/spinner", function() {
       ctx.fillStyle = "#000";
       ctx.font = labelFontSize + "px Avenir";
       ctx.rotate(Math.PI/4);
-      ctx.fillText(choice.value, labelInsidePadding + (spinnerRadius - (labelInsidePadding + labelOutsidePadding))/2, 0);
+      ctx.fillText(choice.value, labelInsidePadding + (radius - (labelInsidePadding + labelOutsidePadding))/2, 0);
 
       // remove icon
       if (mode == MODE_EDIT) {
@@ -110,12 +122,14 @@ floorsix.controller("/spinner", function() {
     ctx.restore();
 
     if (mode == MODE_PLAY) {
-      renderPointer(canvas, cx, cy, spinnerRadius);
+      renderPointer(canvas, cx, cy, radius);
     }
 
     if (mode == MODE_EDIT) {
-      renderEditLabel(canvas, canvas.height * 0.08 + spinnerRadius * 2);
-      renderEditColors(canvas, canvas.height * 0.1 + spinnerRadius * 2 + canvas.height * 0.1, canvas.height * 0.05);
+      renderEditLabel(canvas, canvas.height * 0.08 + radius * 2);
+      FGradientSlider.render(ctx, hueSlider);
+      FGradientSlider.render(ctx, lightnessSlider);
+      FGradientSlider.render(ctx, saturationSlider);
     }
 
     renderIcons(canvas);
@@ -135,73 +149,6 @@ floorsix.controller("/spinner", function() {
     ctx.restore();
   }
 
-  function renderEditColors(canvas, y, h) {
-    var ctx = canvas.context;
-    var color = FColor.createFromHex(choiceToEdit.color);
-
-    ctx.fillStyle = FColor.toString(color);
-
-    renderHuePicker(canvas, y, h);
-    renderLightnessPicker(canvas, y + h * 1.5, h);
-    renderSaturationPicker(canvas, y + h * 3, h);
-  }
-
-  function renderHuePicker(canvas, y, h) {
-    var ctx = canvas.context;
-    var x = canvas.width * 0.05;
-    var w = canvas.width * 0.9;
-    var grd = ctx.createLinearGradient(x,y,w,y);
-    grd.addColorStop(0,"#ff0000");
-    grd.addColorStop(1/6,"#ffff00");
-    grd.addColorStop(2/6,"#00ff00");
-    grd.addColorStop(3/6,"#00ffff");
-    grd.addColorStop(4/6,"#0000ff");
-    grd.addColorStop(5/6,"#ff00ff");
-    grd.addColorStop(1,"#ff0000");
-    ctx.fillStyle = grd;
-    ctx.fillRect(x, y, w, h);
-
-    var color = FColor.createFromHex(choiceToEdit.color);
-    var hsl = FColor.toHSL(color);
-    renderCarat(canvas, x + (hsl.h/360)*w, y, h, h*0.2);
-  }
-
-  function renderLightnessPicker(canvas, y, h) {
-    var color = FColor.createFromHex(choiceToEdit.color);
-    var hsl = FColor.toHSL(color);
-    var hsl2 = Object.assign({}, hsl, { l: 1 });
-    var fullLightness = FColor.createFromHSL(hsl2);
-
-    var ctx = canvas.context;
-    var x = canvas.width * 0.05;
-    var w = canvas.width * 0.9;
-    var grd = ctx.createLinearGradient(x,y,w,y);
-    grd.addColorStop(0, FColor.toString(fullLightness));
-    grd.addColorStop(1, "#000000");
-    ctx.fillStyle = grd;
-    ctx.fillRect(x, y, w, h);
-
-    renderCarat(canvas, x + (1-hsl.l)*w, y, h, h*0.2);
-  }
-
-  function renderSaturationPicker(canvas, y, h) {
-    var color = FColor.createFromHex(choiceToEdit.color);
-    var hsl = FColor.toHSL(color);
-    var hsl2 = Object.assign({}, hsl, { s: 1 });
-    var fullSat = FColor.createFromHSL(hsl2);
-
-    var ctx = canvas.context;
-    var x = canvas.width * 0.05;
-    var w = canvas.width * 0.9;
-    var grd = ctx.createLinearGradient(x,y,w,y);
-    grd.addColorStop(0, FColor.toString(fullSat));
-    grd.addColorStop(1, "#ffffff");
-    ctx.fillStyle = grd;
-    ctx.fillRect(x, y, w, h);
-
-    renderCarat(canvas, x + (1-hsl.s)*w, y, h, h*0.2);
-  }
-
   function renderEditLabel(canvas, y) {
     var fs = canvas.width * 0.1;
     var ctx = canvas.context;
@@ -218,32 +165,16 @@ floorsix.controller("/spinner", function() {
     ctx.fillText(choiceToEdit.value, canvas.width / 2, y);
   }
 
-  function renderCarat(canvas, x, y, h, size) {
-    var ctx = canvas.context;
-    ctx.fillStyle = "#fff";
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x - size*0.6, y - size);
-    ctx.lineTo(x + size*0.6, y - size);
-    ctx.closePath();
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(x, y + h);
-    ctx.lineTo(x - size*0.6, y+h + size);
-    ctx.lineTo(x + size*0.6, y+h + size);
-    ctx.closePath();
-    ctx.fill();
-  }
-
   function renderIcons(canvas) {
     var ctx = canvas.context;
-    var bounds = getIconBounds();
-    if (mode == MODE_EDIT && doneImage.loaded) {
-      ctx.drawImage(doneImage.image, bounds.left, bounds.top, bounds.width, bounds.height);
+    if (mode == MODE_EDIT && doneButton.loaded) {
+      FImageButton.render(ctx, doneButton);
     }
-    else if (mode == MODE_PLAY && settingsImage.loaded) {
-      ctx.drawImage(settingsImage.image, bounds.left, bounds.top, bounds.width, bounds.height);
+    else if (mode == MODE_PLAY && settingsButton.loaded) {
+      FImageButton.render(ctx, settingsButton);
     }
+
+    FImageButton.render(ctx, backButton);
   }
 
   function isHighlightedChoice(choiceIndex) {
@@ -264,17 +195,25 @@ floorsix.controller("/spinner", function() {
   function handleTouchMove(x, y) { }
 
   function handleTouchEnd(x, y) {
-    if (hitTestIcon(x, y)) {
-      if (mode == MODE_EDIT) {
-        mode = MODE_PLAY;
-      }
-      else {
-        mode = MODE_EDIT;
-        phase = IDLE;
-        rotation = 0;
-        highlight = true;
-        choiceToEdit = choices[0];
-      }
+    floorsix.log('touch end ' + x + ',' + y);
+    if (FImageButton.hitTest(backButton, x, y)) {
+      floorsix.navigate('/');
+      return;
+    }
+
+    if (mode == MODE_PLAY && FImageButton.hitTest(settingsButton, x, y)) {
+      mode = MODE_EDIT;
+      phase = IDLE;
+      rotation = 0;
+      highlight = true;
+      choiceToEdit = choices[0];
+      FGradientSlider.setColor(hueSlider, choiceToEdit.color);
+      FGradientSlider.setColor(saturationSlider, choiceToEdit.color);
+      FGradientSlider.setColor(lightnessSlider, choiceToEdit.color);
+      return;
+    }
+    else if (mode == MODE_EDIT && FImageButton.hitTest(doneButton, x, y)) {
+      mode = MODE_PLAY;
       return;
     }
 
@@ -292,29 +231,6 @@ floorsix.controller("/spinner", function() {
       highlight = false;
     }
   }
-
-  function hitTestIcon(x, y) {
-    var bounds = getIconBounds();
-    if (x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom) {
-      return true;
-    }
-    return false;
-  }
-
-  function getIconBounds() {
-    var size = floorsix.getCanvasSize();
-    var iconSize = Math.min(size.width, size.height) * 0.2;
-    var bounds = {
-      left: size.width / 2 - iconSize / 2,
-      top: size.height - iconSize * 1.1,
-      width: iconSize,
-      height: iconSize
-    }
-    bounds.right = bounds.left + bounds.width;
-    bounds.bottom = bounds.top + bounds.height;
-    return bounds;
-  }
-
 
   return {
     'animate': animate,
