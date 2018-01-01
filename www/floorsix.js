@@ -270,25 +270,24 @@
         touchend(pt.x, pt.y);
       }
     });
-    canvas.addEventListener("touchstart", function(e) {
-      var pt = getCoordsRelativeToCanvas(e.touches[0].clientX, e.touches[0].clientY, canvas);
-      if (touchstart) {
-        touchstart(pt.x, pt.y);
-      }
-    });
-    canvas.addEventListener("touchmove", function(e) {
-      var pt = getCoordsRelativeToCanvas(e.touches[0].clientX, e.touches[0].clientY, canvas);
-      if (touchmove) {
-        touchmove(pt.x, pt.y);
-      }
-    });
-    canvas.addEventListener("touchend", function(e) {
-      floorsix.log(JSON.parse(e, null, 2));
-      var pt = getCoordsRelativeToCanvas(e.changedTouches[0].clientX, e.changedTouches[0].clientY, canvas);
-      if (touchend) {
-        touchend(pt.x, pt.y);
-      }
-    });
+    // canvas.addEventListener("touchstart", function(e) {
+    //   var pt = getCoordsRelativeToCanvas(e.touches[0].clientX, e.touches[0].clientY, canvas);
+    //   if (touchstart) {
+    //     touchstart(pt.x, pt.y);
+    //   }
+    // });
+    // canvas.addEventListener("touchmove", function(e) {
+    //   var pt = getCoordsRelativeToCanvas(e.touches[0].clientX, e.touches[0].clientY, canvas);
+    //   if (touchmove) {
+    //     touchmove(pt.x, pt.y);
+    //   }
+    // });
+    // canvas.addEventListener("touchend", function(e) {
+    //   var pt = getCoordsRelativeToCanvas(e.changedTouches[0].clientX, e.changedTouches[0].clientY, canvas);
+    //   if (touchend) {
+    //     touchend(pt.x, pt.y);
+    //   }
+    // });
   }
 
   function getCoordsRelativeToCanvas(x, y, canvas) {
