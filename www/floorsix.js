@@ -283,6 +283,7 @@
       }
     });
     canvas.addEventListener("touchend", function(e) {
+      floorsix.log(JSON.parse(e, null, 2));
       var pt = getCoordsRelativeToCanvas(e.changedTouches[0].clientX, e.changedTouches[0].clientY, canvas);
       if (touchend) {
         touchend(pt.x, pt.y);
