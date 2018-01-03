@@ -1,6 +1,7 @@
 var FColor = {};
 
 (function() {
+  var rgb_r = /rgba?\(\s*([0-9]+)\s*,\s*([0-9]+)\s*,\s*([0-9]+)\s*(,\s*([0-9\.]+))?\s*\)/i;
 
   FColor.create = function(r, g, b, a) {
     return {
@@ -11,23 +12,37 @@ var FColor = {};
     }
   }
 
-  FColor.createFromHex = function(hex) {
-    if (typeof(hex) != 'string') {
-      throw "Invalid input format for FColor.convertFromHex";
+  FColor.createFromString = function(str) {
+    if (typeof(str) != 'string') {
+      throw "Invalid input format for FColor.createFromString";
     }
-
-    if (hex.substring(0, 1) == '#') {
-      hex = hex.substring(1);
+    var r, g, b, a = 1;
+    if (str.substring(0, 1) == '#') {
+      var hex = str.substring(1);
+      if (hex.length == 3) {
+        hex = hex.substring(0, 1) + hex.substring(0, 1)
+          + hex.substring(1, 2) + hex.substring(1, 2)
+          + hex.substring(2, 3) + hex.substring(2, 3);
+      }
+      r = parseInt(hex.substring(0, 2), 16);
+      g = parseInt(hex.substring(2, 4), 16);
+      b = parseInt(hex.substring(4, 6), 16);
     }
-    if (hex.length == 3) {
-      hex = hex.substring(0, 1) + hex.substring(0, 1)
-        + hex.substring(1, 2) + hex.substring(1, 2)
-        + hex.substring(2, 3) + hex.substring(2, 3);
+    else if (str.substring(0, 3) == 'rgb') {
+      var match = rgb_r.exec(str);
+      if (match && match.length >= 4) {
+        r = match[1];
+        g = match[2];
+        b = match[3];
+        if (match.length >= 6) {
+          a = match[5];
+        }
+      }
+      else {
+        throw "Invalid rgba input format for FColor.createFromString";
+      }
     }
-    var r = parseInt(hex.substring(0, 2), 16);
-    var g = parseInt(hex.substring(2, 4), 16);
-    var b = parseInt(hex.substring(4, 6), 16);
-    return FColor.create(r, g, b);
+    return FColor.create(r, g, b, a);
   }
 
   FColor.createFromHSL = function(hsl) {

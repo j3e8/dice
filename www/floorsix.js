@@ -6,7 +6,7 @@
 
   var lastFrame;
   var controllers = {};
-  var animator, renderer, touchstart, touchmove, touchend;
+  var animator, renderer, click, mousedown, mousemove, mouseup, touchstart, touchmove, touchend;
   var canvas;
   var currentRoute;
   var config = {
@@ -208,6 +208,10 @@
       var result = controllers[currentRoute]();
       animator = result.animate;
       renderer = result.render;
+      click = result.click;
+      mousedown = result.mousedown;
+      mousemove = result.mousemove;
+      mouseup = result.mouseup;
       touchstart = result.touchstart;
       touchmove = result.touchmove;
       touchend = result.touchend;
@@ -252,42 +256,54 @@
   }
 
   function initClickEvents() {
+    canvas.addEventListener("click", function(e) {
+      var pt = getCoordsRelativeToCanvas(e.clientX, e.clientY, canvas);
+      if (click) {
+        click(pt.x, pt.y);
+      }
+    });
     canvas.addEventListener("mousedown", function(e) {
       var pt = getCoordsRelativeToCanvas(e.clientX, e.clientY, canvas);
-      if (touchstart) {
-        touchstart(pt.x, pt.y);
+      if (mousedown) {
+        mousedown(pt.x, pt.y);
       }
     });
     canvas.addEventListener("mousemove", function(e) {
       var pt = getCoordsRelativeToCanvas(e.clientX, e.clientY, canvas);
-      if (touchmove) {
-        touchmove(pt.x, pt.y);
+      if (mousemove) {
+        mousemove(pt.x, pt.y);
       }
     });
     canvas.addEventListener("mouseup", function(e) {
       var pt = getCoordsRelativeToCanvas(e.clientX, e.clientY, canvas);
-      if (touchend) {
-        touchend(pt.x, pt.y);
+      if (mouseup) {
+        mouseup(pt.x, pt.y);
       }
     });
-    // canvas.addEventListener("touchstart", function(e) {
-    //   var pt = getCoordsRelativeToCanvas(e.touches[0].clientX, e.touches[0].clientY, canvas);
-    //   if (touchstart) {
-    //     touchstart(pt.x, pt.y);
-    //   }
-    // });
-    // canvas.addEventListener("touchmove", function(e) {
-    //   var pt = getCoordsRelativeToCanvas(e.touches[0].clientX, e.touches[0].clientY, canvas);
-    //   if (touchmove) {
-    //     touchmove(pt.x, pt.y);
-    //   }
-    // });
-    // canvas.addEventListener("touchend", function(e) {
-    //   var pt = getCoordsRelativeToCanvas(e.changedTouches[0].clientX, e.changedTouches[0].clientY, canvas);
-    //   if (touchend) {
-    //     touchend(pt.x, pt.y);
-    //   }
-    // });
+    canvas.addEventListener("touchstart", function(e) {
+      var pts = e.touches.map(function(t) {
+        return getCoordsRelativeToCanvas(t.clientX, t.clientY, canvas);
+      });
+      if (touchstart) {
+        touchstart(pts);
+      }
+    });
+    canvas.addEventListener("touchmove", function(e) {
+      var pts = e.touches.map(function(t) {
+        return getCoordsRelativeToCanvas(t.clientX, t.clientY, canvas);
+      });
+      if (touchmove) {
+        touchmove(pts);
+      }
+    });
+    canvas.addEventListener("touchend", function(e) {
+      var pts = e.touches.map(function(t) {
+        return getCoordsRelativeToCanvas(t.clientX, t.clientY, canvas);
+      });
+      if (touchend) {
+        touchend(pts);
+      }
+    });
   }
 
   function getCoordsRelativeToCanvas(x, y, canvas) {

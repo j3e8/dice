@@ -107,7 +107,14 @@ floorsix.controller("/spinner", function() {
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillStyle = "#000";
+      var color = FColor.createFromString(choice.color);
+      var hsl = FColor.toHSL(color);
+      if (hsl.l >= 0.5) {
+        ctx.fillStyle = "#000";
+      }
+      else {
+        ctx.fillStyle = "#fff";
+      }
       ctx.font = labelFontSize + "px Avenir";
       ctx.rotate(Math.PI/4);
       ctx.fillText(choice.value, labelInsidePadding + (radius - (labelInsidePadding + labelOutsidePadding))/2, 0);
@@ -190,12 +197,8 @@ floorsix.controller("/spinner", function() {
     return false;
   }
 
-  function handleTouchStart(x, y) { }
-
-  function handleTouchMove(x, y) { }
-
-  function handleTouchEnd(x, y) {
-    floorsix.log('touch end ' + x + ',' + y);
+  function handleClick(x, y) {
+    floorsix.log('handleClick ' + x + ',' + y);
     if (FImageButton.hitTest(backButton, x, y)) {
       floorsix.navigate('/');
       return;
@@ -232,9 +235,140 @@ floorsix.controller("/spinner", function() {
     }
   }
 
+  var dragObject = null;
+
+  function handleMouseDown(x, y) {
+    mousedown(x, y);
+  }
+
+  function handleTouchStart(pts) {
+    var pt = pts[0];
+    mousedown(pt.x, pt.y);
+  }
+
+  function mousedown(x, y) {
+    if (FGradientSlider.hitTest(hueSlider, x, y)) {
+      var pct = FGradientSlider.calculateXPercentage(hueSlider, x, y);
+      if (pct !== null) {
+        dragObject = hueSlider;
+        recalculateHue(pct);
+      }
+    }
+    else if (FGradientSlider.hitTest(saturationSlider, x, y)) {
+      var pct = FGradientSlider.calculateXPercentage(saturationSlider, x, y);
+      if (pct !== null) {
+        dragObject = saturationSlider;
+        recalculateSaturation(pct);
+      }
+    }
+    else if (FGradientSlider.hitTest(lightnessSlider, x, y)) {
+      var pct = FGradientSlider.calculateXPercentage(lightnessSlider, x, y);
+      if (pct !== null) {
+        dragObject = lightnessSlider;
+        recalculateLightness(pct);
+      }
+    }
+  }
+
+
+
+  function handleMouseMove(x, y) {
+    mousemove(x, y);
+  }
+
+  function handleTouchMove(pts) {
+    var pt = pts[0];
+    mousemove(pt.x, pt.y);
+  }
+
+  function mousemove(x, y) {
+    if (dragObject == hueSlider) {
+      var pct = FGradientSlider.calculateXPercentage(hueSlider, x, y);
+      if (pct != null) {
+        recalculateHue(pct);
+      }
+    }
+    else if (dragObject == saturationSlider) {
+      var pct = FGradientSlider.calculateXPercentage(saturationSlider, x, y);
+      if (pct != null) {
+        recalculateSaturation(pct);
+      }
+    }
+    else if (dragObject == lightnessSlider) {
+      var pct = FGradientSlider.calculateXPercentage(lightnessSlider, x, y);
+      if (pct != null) {
+        recalculateLightness(pct);
+      }
+    }
+  }
+
+
+
+  function handleMouseUp(x, y) {
+    up(x, y);
+  }
+
+  function handleTouchEnd(pts) {
+    var pt = pts[0];
+    up(pt.x, pt.y);
+  }
+
+  function up(x, y) {
+    if (dragObject == hueSlider) {
+      var pct = FGradientSlider.calculateXPercentage(hueSlider, x, y);
+      if (pct !== null) {
+        recalculateHue(pct);
+      }
+    }
+    else if (dragObject == saturationSlider) {
+      var pct = FGradientSlider.calculateXPercentage(saturationSlider, x, y);
+      if (pct !== null) {
+        recalculateSaturation(pct);
+      }
+    }
+    else if (dragObject == lightnessSlider) {
+      var pct = FGradientSlider.calculateXPercentage(lightnessSlider, x, y);
+      if (pct !== null) {
+        recalculateLightness(pct);
+      }
+    }
+    dragObject = null;
+  }
+
+  function recalculateHue(pct) {
+    var currentColor = FColor.createFromString(choiceToEdit.color);
+    var hsl = FColor.toHSL(currentColor);
+    hsl.h = pct * 360;
+    var newColor = FColor.createFromHSL(hsl);
+    choiceToEdit.color = FColor.toString(newColor);
+    FGradientSlider.setColor(hueSlider, choiceToEdit.color);
+  }
+
+  function recalculateSaturation(pct) {
+    var currentColor = FColor.createFromString(choiceToEdit.color);
+    var hsl = FColor.toHSL(currentColor);
+    hsl.s = (1 - pct) * 1;
+    var newColor = FColor.createFromHSL(hsl);
+    choiceToEdit.color = FColor.toString(newColor);
+    FGradientSlider.setColor(saturationSlider, choiceToEdit.color);
+  }
+
+  function recalculateLightness(pct) {
+    var currentColor = FColor.createFromString(choiceToEdit.color);
+    var hsl = FColor.toHSL(currentColor);
+    hsl.l = (1 - pct) * 1;
+    var newColor = FColor.createFromHSL(hsl);
+    choiceToEdit.color = FColor.toString(newColor);
+    FGradientSlider.setColor(lightnessSlider, choiceToEdit.color);
+  }
+
   return {
     'animate': animate,
     'render': render,
+    'click': handleClick,
+    'mousedown': handleMouseDown,
+    'mousemove': handleMouseMove,
+    'mouseup': handleMouseUp,
     'touchstart': handleTouchStart,
     'touchmove': handleTouchMove,
     'touchend': handleTouchEnd

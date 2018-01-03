@@ -37,6 +37,41 @@ var FGradientSlider = {};
     }
   }
 
+  FGradientSlider.getBounds = function(slider) {
+    var bounds = {
+      left: slider.x,
+      top: slider.y,
+      width: slider.width,
+      height: slider.height,
+      right: slider.x + slider.width,
+      bottom: slider.y + slider.height
+    }
+    return bounds;
+  }
+
+  FGradientSlider.hitTest = function(slider, x, y) {
+    var bounds = FGradientSlider.getBounds(slider);
+    if (x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom) {
+      return true;
+    }
+    return false;
+  }
+
+  FGradientSlider.calculateXPercentage = function(slider, x, y) {
+    var bounds = FGradientSlider.getBounds(slider);
+    if (x <= bounds.left) {
+      return 0;
+    }
+    else if (x >= bounds.right) {
+      x = 1;
+    }
+    else {
+      var pct = (x - bounds.left) / bounds.width;
+      return pct;
+    }
+    return null;
+  }
+
   function renderHuePicker(ctx, slider) {
     var grd = ctx.createLinearGradient(slider.x, slider.y, slider.width, slider.y);
     grd.addColorStop(0, "#ff0000");
@@ -49,13 +84,13 @@ var FGradientSlider = {};
     ctx.fillStyle = grd;
     ctx.fillRect(slider.x, slider.y, slider.width, slider.height);
 
-    var color = FColor.createFromHex(slider.color);
+    var color = FColor.createFromString(slider.color);
     var hsl = FColor.toHSL(color);
     renderCarat(ctx, slider.x + (hsl.h/360)*slider.width, slider.y, slider.height, slider.height*0.2);
   }
 
   function renderLightnessPicker(ctx, slider) {
-    var color = FColor.createFromHex(slider.color);
+    var color = FColor.createFromString(slider.color);
     var hsl = FColor.toHSL(color);
     var hsl2 = Object.assign({}, hsl, { l: 1 });
     var fullLightness = FColor.createFromHSL(hsl2);
@@ -70,7 +105,7 @@ var FGradientSlider = {};
   }
 
   function renderSaturationPicker(ctx, slider) {
-    var color = FColor.createFromHex(slider.color);
+    var color = FColor.createFromString(slider.color);
     var hsl = FColor.toHSL(color);
     var hsl2 = Object.assign({}, hsl, { s: 1 });
     var fullSat = FColor.createFromHSL(hsl2);
