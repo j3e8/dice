@@ -41,7 +41,7 @@ var Choice = {};
     ctx.textBaseline = "middle";
     var color = FColor.createFromString(choice.color);
     var hsl = FColor.toHSL(color);
-    if (hsl.l >= 0.5) {
+    if (hsl.l >= 0.7) {
       ctx.fillStyle = "#000";
     }
     else {

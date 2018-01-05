@@ -1,7 +1,13 @@
 floorsix.controller("/dice", function() {
+  var diceTypeStr = floorsix.search().type || 'SIX';
+  if (!Dice[diceTypeStr] || typeof(Dice[diceTypeStr]) != 'number') {
+    diceTypeStr = 'SIX';
+  }
+  var diceType = Dice[diceTypeStr];
+
   var dice = [
-    Dice.createDie(),
-    Dice.createDie()
+    Dice.create(diceType),
+    Dice.create(diceType)
   ];
 
   var BACKGROUND_COLOR = "#323232";
@@ -20,6 +26,9 @@ floorsix.controller("/dice", function() {
   var phase = IDLE;
   var rollStart = null;
   var lastRollFrame = null;
+
+  var canvasSize = floorsix.getCanvasSize();
+  var backButton = FImageButton.create('www/images/back.svg', { x: canvasSize.width * 0.02, y: canvasSize.width * 0.02 }, { width: canvasSize.width * 0.1 });
 
   function animate(elapsedMs) {
     if (phase == ROLLING) {
@@ -93,13 +102,15 @@ floorsix.controller("/dice", function() {
     ctx.fillStyle = "#ffffff";
     ctx.font = Math.round(controlsHeight*0.8) + "px Avenir";
     ctx.fillText(dice.length, canvas.width/2, canvas.height - controlsHeight/2);
+
+    FImageButton.render(ctx, backButton);
   }
 
-  function handleTouchStart(x, y) { }
-
-  function handleTouchMove(x, y) { }
-
-  function handleTouchEnd(x, y) {
+  function handleClick(x, y) {
+    if (FImageButton.hitTest(backButton, x, y)) {
+      floorsix.navigate('/');
+      return;
+    }
     var size = floorsix.getCanvasSize();
     var controlsHeight = determineControlsHeight(size);
     if (y >= size.height - controlsHeight) {
@@ -134,7 +145,7 @@ floorsix.controller("/dice", function() {
 
   function addDie() {
     if (dice.length < 12) {
-      dice.push(Dice.createDie());
+      dice.push(Dice.create(diceType));
     }
   }
 
@@ -169,8 +180,6 @@ floorsix.controller("/dice", function() {
   return {
     'animate': animate,
     'render': render,
-    'touchstart': handleTouchStart,
-    'touchmove': handleTouchMove,
-    'touchend': handleTouchEnd
+    'click': handleClick
   }
 });
