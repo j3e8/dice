@@ -90,6 +90,14 @@
     return angle;
   }
 
+  floorsix.math.polarToCartesian = function(polar) {
+    var c = {
+      x: Math.cos(polar.t) * polar.r,
+      y: Math.sin(polar.t) * polar.r
+    }
+    return c;
+  }
+
   floorsix.navigate = function(route) {
     navigator.phase = NAV_FADE_OUT;
     navigator.shadowOpacity = 0;

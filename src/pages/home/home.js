@@ -9,8 +9,11 @@ floorsix.controller("/", function() {
 
   var _icon4size = iconWidth * 1.2;
   var _icon4offset =  (_icon4size - iconWidth) / 2;
-  var dice4Icon = FImageButton.create('www/images/dice4.svg', { x: padding - _icon4offset, y: padding - _icon4offset }, { width: iconWidth * 1.2 });
-  var dice6Icon = FImageButton.create('www/images/dice6.svg', { x: padding + (iconWidth + padding), y: padding }, { width: iconWidth });
+  var dice4Icon = FImageButton.create('www/images/dice4icon.svg', { x: padding - _icon4offset, y: padding - _icon4offset }, { width: iconWidth * 1.2 });
+  var dice6Icon = FImageButton.create('www/images/dice6icon.svg', { x: padding + (iconWidth + padding), y: padding }, { width: iconWidth });
+  var dice8Icon = FImageButton.create('www/images/dice8icon.svg', { x: padding + (iconWidth + padding) * 2, y: padding }, { width: iconWidth });
+  var dice10Icon = FImageButton.create('www/images/dice10icon.svg', { x: padding, y: padding + (iconWidth + padding) }, { width: iconWidth });
+  var dice12Icon = FImageButton.create('www/images/dice12icon.svg', { x: padding + (iconWidth + padding), y: padding + (iconWidth + padding) }, { width: iconWidth });
 
   function animate(elapsedMs) { }
 
@@ -23,6 +26,9 @@ floorsix.controller("/", function() {
 
     FImageButton.render(ctx, dice4Icon);
     FImageButton.render(ctx, dice6Icon);
+    FImageButton.render(ctx, dice8Icon);
+    FImageButton.render(ctx, dice10Icon);
+    FImageButton.render(ctx, dice12Icon);
   }
 
   function handleClick(x, y) {
@@ -32,6 +38,18 @@ floorsix.controller("/", function() {
     }
     if (FImageButton.hitTest(dice6Icon, x, y)) {
       floorsix.navigate('/dice?type=SIX');
+      return;
+    }
+    if (FImageButton.hitTest(dice8Icon, x, y)) {
+      floorsix.navigate('/dice?type=EIGHT');
+      return;
+    }
+    if (FImageButton.hitTest(dice10Icon, x, y)) {
+      floorsix.navigate('/dice?type=TEN');
+      return;
+    }
+    if (FImageButton.hitTest(dice12Icon, x, y)) {
+      floorsix.navigate('/dice?type=TWELVE');
       return;
     }
   }

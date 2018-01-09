@@ -9,31 +9,23 @@ Dice.TWENTY = 20;
 Dice.ONE_THRU_THREE = 101;
 
 (function() {
-  var options = {};
-  options[Dice.FOUR] = {
-    diceColor: "#9C5ED3",
-    dotColor: "#510693"
-  }
-  options[Dice.SIX] = {
-    diceColor: "#A1D65C",
-    dotColor: "#5C9605"
-  }
-
   Dice.create = function(type) {
     var max;
+    var img;
     switch (type) {
-      case Dice.FOUR: max = 4; break;
-      case Dice.SIX: max = 6; break;
-      case Dice.EIGHT: max = 8; break;
-      case Dice.TEN: max = 10; break;
-      case Dice.TWELVE: max = 12; break;
-      case Dice.TWENTY: max = 20; break;
-      case Dice.ONE_THRU_THREE: max = 3; break;
-      default: max = 6; break;
+      case Dice.FOUR: max = 4; img = FImage.create('www/images/dice4.svg'); break;
+      case Dice.SIX: max = 6; img = FImage.create('www/images/dice6.svg'); break;
+      case Dice.EIGHT: max = 8; img = FImage.create('www/images/dice8.svg'); break;
+      case Dice.TEN: max = 10; img = FImage.create('www/images/dice10.svg'); break;
+      case Dice.TWELVE: max = 12; img = FImage.create('www/images/dice12.svg'); break;
+      // case Dice.TWENTY: max = 20; img = FImage.create('www/images/dice20.svg'); break;
+      // case Dice.ONE_THRU_THREE: max = 3; img = FImage.create('www/images/dice1-3.svg'); break;
+      default: max = 6; img = FImage.create('www/images/dice6.svg'); break;
     }
     return {
       type: type,
       max: max,
+      img: img,
       value: Math.ceil(Math.random() * max),
       rotation: pickRandomRotation()
     }
@@ -60,7 +52,6 @@ Dice.ONE_THRU_THREE = 101;
       dotSize: dotSize
     }
 
-    ctx.fillStyle = options[die.type].diceColor;
     ctx.save();
     ctx.translate(cx, cy);
     if (die.rotation) {
@@ -74,6 +65,18 @@ Dice.ONE_THRU_THREE = 101;
       case Dice.SIX:
         renderSixSidedDie(ctx, die, dieOptions);
         break;
+      case Dice.EIGHT:
+        renderEightSidedDie(ctx, die, dieOptions);
+        break;
+      case Dice.TEN:
+        renderTenSidedDie(ctx, die, dieOptions);
+        break;
+      case Dice.TWELVE:
+        renderTwelveSidedDie(ctx, die, dieOptions);
+        break;
+      case Dice.TWENTY:
+        renderTwentySidedDie(ctx, die, dieOptions);
+        break;
       default:
         renderSixSidedDie(ctx, die, dieOptions);
         break;
@@ -83,33 +86,23 @@ Dice.ONE_THRU_THREE = 101;
   }
 
   function renderFourSidedDie(ctx, die, opt) {
-    var radius = opt.radius * 1.25;
-    ctx.beginPath();
-    ctx.moveTo(0 - radius * Math.cos(Math.PI/6), 0 + radius * Math.sin(Math.PI/6));
-    ctx.lineTo(0, 0 - radius);
-    ctx.lineTo(0 + radius * Math.cos(Math.PI/6), 0 + radius * Math.sin(Math.PI/6));
-    ctx.closePath();
-    ctx.fill();
+    opt = Object.assign({}, opt);
+    opt.radius *= 1.25;
 
-    ctx.fillStyle = options[die.type].dotColor;
-    ctx.font = Math.round(radius * 0.5) + "px Avenir";
+    ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.font = Math.round(opt.radius * 0.5) + "px Avenir";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    var yo = radius * -0.05;
+    var yo = opt.radius * -0.05;
     switch (die.value) {
-      case 1: renderDigit(ctx, '1', 0, yo, 0); renderDigit(ctx, '4', 0, yo, Math.PI*2/3); renderDigit(ctx, '2', 0, yo, Math.PI*4/3); break;
-      case 2: renderDigit(ctx, '2', 0, yo, 0); renderDigit(ctx, '3', 0, yo, Math.PI*2/3); renderDigit(ctx, '1', 0, yo, Math.PI*4/3); break;
-      case 3: renderDigit(ctx, '3', 0, yo, 0); renderDigit(ctx, '4', 0, yo, Math.PI*2/3); renderDigit(ctx, '1', 0, yo, Math.PI*4/3); break;
-      case 4: renderDigit(ctx, '4', 0, yo, 0); renderDigit(ctx, '3', 0, yo, Math.PI*2/3); renderDigit(ctx, '2', 0, yo, Math.PI*4/3); break;
+      case 1: renderDigit(ctx, '1', 0, yo, 0); ctx.globalAlpha = 0.25; renderDigit(ctx, '4', 0, yo, Math.PI*2/3); renderDigit(ctx, '2', 0, yo, Math.PI*4/3); break;
+      case 2: renderDigit(ctx, '2', 0, yo, 0); ctx.globalAlpha = 0.25; renderDigit(ctx, '3', 0, yo, Math.PI*2/3); renderDigit(ctx, '1', 0, yo, Math.PI*4/3); break;
+      case 3: renderDigit(ctx, '3', 0, yo, 0); ctx.globalAlpha = 0.25; renderDigit(ctx, '4', 0, yo, Math.PI*2/3); renderDigit(ctx, '1', 0, yo, Math.PI*4/3); break;
+      case 4: renderDigit(ctx, '4', 0, yo, 0); ctx.globalAlpha = 0.25; renderDigit(ctx, '3', 0, yo, Math.PI*2/3); renderDigit(ctx, '2', 0, yo, Math.PI*4/3); break;
       default: break;
     }
-  }
-
-  function renderDigit(ctx, digit, x, y, rotation) {
-    ctx.save();
-    ctx.rotate(rotation);
-    ctx.fillText(digit, x, y);
-    ctx.restore();
   }
 
   function renderSixSidedDie(ctx, die, opt) {
@@ -130,6 +123,7 @@ Dice.ONE_THRU_THREE = 101;
     var ty = 0 - opt.diameter * 0.24;
     var by = 0 + opt.diameter * 0.24;
 
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
     switch (die.value) {
       case 1: renderDot(ctx, 0, 0, die.type, opt.dotSize); break;
       case 2: renderDot(ctx, lx, ty, die.type, opt.dotSize); renderDot(ctx, rx, by, die.type, opt.dotSize); break;
@@ -141,8 +135,54 @@ Dice.ONE_THRU_THREE = 101;
     }
   }
 
+  function renderEightSidedDie(ctx, die, opt) {
+    ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    renderDigit(ctx, die.value, 0, 0, 0);
+  }
+
+  function renderTenSidedDie(ctx, die, opt) {
+    ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    renderDigit(ctx, die.value, 0, opt.radius * 0.15, 0);
+  }
+
+  function renderTwelveSidedDie(ctx, die, opt) {
+    ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    renderDigit(ctx, die.value, 0, 0, 0);
+  }
+
+  function renderTwentySidedDie(ctx, die, opt) {
+    ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    renderDigit(ctx, die.value, 0, 0, 0);
+  }
+
+  function renderDigit(ctx, digit, x, y, rotation) {
+    ctx.save();
+    ctx.rotate(rotation);
+    ctx.fillText(digit, x, y);
+    ctx.restore();
+  }
+
   function renderDot(ctx, cx, cy, type, dotSize) {
-    ctx.fillStyle = options[type].dotColor;
     ctx.beginPath();
     ctx.arc(cx, cy, dotSize, 0, Math.PI * 2);
     ctx.fill();
