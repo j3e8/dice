@@ -6,7 +6,6 @@ Dice.EIGHT = 8;
 Dice.TEN = 10;
 Dice.TWELVE = 12;
 Dice.TWENTY = 20;
-Dice.ONE_THRU_THREE = 101;
 
 (function() {
   Dice.create = function(type) {
@@ -18,8 +17,7 @@ Dice.ONE_THRU_THREE = 101;
       case Dice.EIGHT: max = 8; img = FImage.create('www/images/dice8.svg'); break;
       case Dice.TEN: max = 10; img = FImage.create('www/images/dice10.svg'); break;
       case Dice.TWELVE: max = 12; img = FImage.create('www/images/dice12.svg'); break;
-      // case Dice.TWENTY: max = 20; img = FImage.create('www/images/dice20.svg'); break;
-      // case Dice.ONE_THRU_THREE: max = 3; img = FImage.create('www/images/dice1-3.svg'); break;
+      case Dice.TWENTY: max = 20; img = FImage.create('www/images/dice20.svg'); break;
       default: max = 6; img = FImage.create('www/images/dice6.svg'); break;
     }
     return {
@@ -91,7 +89,7 @@ Dice.ONE_THRU_THREE = 101;
 
     ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.font = Math.round(opt.radius * 0.5) + "px Avenir";
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
@@ -106,31 +104,21 @@ Dice.ONE_THRU_THREE = 101;
   }
 
   function renderSixSidedDie(ctx, die, opt) {
-    ctx.beginPath();
-    ctx.moveTo(0 - opt.radius + opt.cornerRadius, 0 - opt.radius);
-    ctx.lineTo(0 + opt.radius - opt.cornerRadius, 0 - opt.radius);
-    ctx.arc(0 + opt.radius - opt.cornerRadius, 0 - opt.radius + opt.cornerRadius, opt.cornerRadius, -Math.PI/2, 0);
-    ctx.lineTo(0 + opt.radius, 0 + opt.radius - opt.cornerRadius);
-    ctx.arc(0 + opt.radius - opt.cornerRadius, 0 + opt.radius - opt.cornerRadius, opt.cornerRadius, 0, Math.PI/2);
-    ctx.lineTo(0 - opt.radius + opt.cornerRadius, 0 + opt.radius);
-    ctx.arc(0 - opt.radius + opt.cornerRadius, 0 + opt.radius - opt.cornerRadius, opt.cornerRadius, Math.PI/2, Math.PI);
-    ctx.lineTo(0 - opt.radius, 0 - opt.radius + opt.cornerRadius);
-    ctx.arc(0 - opt.radius + opt.cornerRadius, 0 - opt.radius + opt.cornerRadius, opt.cornerRadius, Math.PI, Math.PI*1.5);
-    ctx.fill();
+    ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
 
     var lx = 0 - opt.diameter * 0.23;
     var rx = 0 + opt.diameter * 0.23;
     var ty = 0 - opt.diameter * 0.24;
     var by = 0 + opt.diameter * 0.24;
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     switch (die.value) {
-      case 1: renderDot(ctx, 0, 0, die.type, opt.dotSize); break;
-      case 2: renderDot(ctx, lx, ty, die.type, opt.dotSize); renderDot(ctx, rx, by, die.type, opt.dotSize); break;
-      case 3: renderDot(ctx, 0, 0, die.type, opt.dotSize); renderDot(ctx, lx, ty, die.type, opt.dotSize); renderDot(ctx, rx, by, die.type, opt.dotSize); break;
-      case 4: renderDot(ctx, lx, ty, die.type, opt.dotSize); renderDot(ctx, lx, by, die.type, opt.dotSize); renderDot(ctx, rx, ty, die.type, opt.dotSize); renderDot(ctx, rx, by, die.type, opt.dotSize); break;
-      case 5: renderDot(ctx, 0, 0, die.type, opt.dotSize); renderDot(ctx, lx, ty, die.type, opt.dotSize); renderDot(ctx, lx, by, die.type, opt.dotSize); renderDot(ctx, rx, ty, die.type, opt.dotSize); renderDot(ctx, rx, by, die.type, opt.dotSize); break;
-      case 6: renderDot(ctx, lx, ty, die.type, opt.dotSize); renderDot(ctx, lx, 0, die.type, opt.dotSize); renderDot(ctx, lx, by, die.type, opt.dotSize); renderDot(ctx, rx, ty, die.type, opt.dotSize); renderDot(ctx, rx, 0, die.type, opt.dotSize); renderDot(ctx, rx, by, die.type, opt.dotSize); break;
+      case 1: renderDot(ctx, 0, 0, opt.dotSize); break;
+      case 2: renderDot(ctx, lx, ty, opt.dotSize); renderDot(ctx, rx, by, opt.dotSize); break;
+      case 3: renderDot(ctx, 0, 0, opt.dotSize); renderDot(ctx, lx, ty, opt.dotSize); renderDot(ctx, rx, by, opt.dotSize); break;
+      case 4: renderDot(ctx, lx, ty, opt.dotSize); renderDot(ctx, lx, by, opt.dotSize); renderDot(ctx, rx, ty, opt.dotSize); renderDot(ctx, rx, by, opt.dotSize); break;
+      case 5: renderDot(ctx, 0, 0, opt.dotSize); renderDot(ctx, lx, ty, opt.dotSize); renderDot(ctx, lx, by, opt.dotSize); renderDot(ctx, rx, ty, opt.dotSize); renderDot(ctx, rx, by, opt.dotSize); break;
+      case 6: renderDot(ctx, lx, ty, opt.dotSize); renderDot(ctx, lx, 0, opt.dotSize); renderDot(ctx, lx, by, opt.dotSize); renderDot(ctx, rx, ty, opt.dotSize); renderDot(ctx, rx, 0, opt.dotSize); renderDot(ctx, rx, by, opt.dotSize); break;
       default: break;
     }
   }
@@ -138,7 +126,7 @@ Dice.ONE_THRU_THREE = 101;
   function renderEightSidedDie(ctx, die, opt) {
     ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -148,7 +136,7 @@ Dice.ONE_THRU_THREE = 101;
   function renderTenSidedDie(ctx, die, opt) {
     ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -158,7 +146,7 @@ Dice.ONE_THRU_THREE = 101;
   function renderTwelveSidedDie(ctx, die, opt) {
     ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
     ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -168,8 +156,8 @@ Dice.ONE_THRU_THREE = 101;
   function renderTwentySidedDie(ctx, die, opt) {
     ctx.drawImage(die.img.image, -opt.radius, -opt.radius, opt.radius*2, opt.radius*2);
 
-    ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
-    ctx.font = Math.round(opt.radius * 0.8) + "px Avenir";
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.font = Math.round(opt.radius * 0.5) + "px Avenir";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     renderDigit(ctx, die.value, 0, 0, 0);
@@ -182,7 +170,7 @@ Dice.ONE_THRU_THREE = 101;
     ctx.restore();
   }
 
-  function renderDot(ctx, cx, cy, type, dotSize) {
+  function renderDot(ctx, cx, cy, dotSize) {
     ctx.beginPath();
     ctx.arc(cx, cy, dotSize, 0, Math.PI * 2);
     ctx.fill();
