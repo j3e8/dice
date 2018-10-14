@@ -5,34 +5,48 @@ floorsix.controller("/", function() {
 
   var canvasSize = floorsix.getCanvasSize();
   var padding = PADDING_PCT * canvasSize.width;
+  var vpadding = PADDING_PCT * canvasSize.width * 2;
   var iconWidth = ((canvasSize.width - padding) / COLUMNS) - padding;
 
-  var _icon4size = iconWidth * 1.2;
-  var _icon4offset =  (_icon4size - iconWidth) / 2;
+  var dice6Icon = FImageButton.create('www/images/dice6icon.svg', { x: padding, y: vpadding }, { width: iconWidth });
+  var dice4Icon = FImageButton.create('www/images/dice4icon.svg', { x: padding + (iconWidth + padding), y: vpadding }, { width: iconWidth });
+  var dice4Icon = FImageButton.create('www/images/dice4icon.svg', { x: padding + (iconWidth + padding), y: vpadding }, { width: iconWidth });
+  var dice8Icon = FImageButton.create('www/images/dice8icon.svg', { x: padding + (iconWidth + padding) * 2, y: vpadding }, { width: iconWidth });
 
-  var dice4Icon = FImageButton.create('www/images/dice4icon.svg', { x: padding - _icon4offset, y: padding - _icon4offset }, { width: iconWidth * 1.2 });
-  var dice6Icon = FImageButton.create('www/images/dice6icon.svg', { x: padding + (iconWidth + padding), y: padding }, { width: iconWidth });
-  var dice8Icon = FImageButton.create('www/images/dice8icon.svg', { x: padding + (iconWidth + padding) * 2, y: padding }, { width: iconWidth });
-
-  var dice10Icon = FImageButton.create('www/images/dice10icon.svg', { x: padding, y: padding + (iconWidth + padding) }, { width: iconWidth });
-  var dice12Icon = FImageButton.create('www/images/dice12icon.svg', { x: padding + (iconWidth + padding), y: padding + (iconWidth + padding) }, { width: iconWidth });
-  var dice20Icon = FImageButton.create('www/images/dice20icon.svg', { x: padding + (iconWidth + padding) * 2, y: padding + (iconWidth + padding) }, { width: iconWidth });
+  var dice10Icon = FImageButton.create('www/images/dice10icon.svg', { x: padding, y: vpadding + (iconWidth + vpadding) }, { width: iconWidth });
+  var dice12Icon = FImageButton.create('www/images/dice12icon.svg', { x: padding + (iconWidth + padding), y: vpadding + (iconWidth + vpadding) }, { width: iconWidth });
+  var dice20Icon = FImageButton.create('www/images/dice20icon.svg', { x: padding + (iconWidth + padding) * 2, y: vpadding + (iconWidth + vpadding) }, { width: iconWidth });
 
   function animate(elapsedMs) { }
 
   function render(canvas) {
     var ctx = canvas.context;
-    var iconWidth = canvas.width * 0.2;
 
     ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    FImageButton.render(ctx, dice4Icon);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.font = Math.floor(iconWidth * 0.18) + "px Avenir";
+
     FImageButton.render(ctx, dice6Icon);
+    ctx.fillText('6 sided', dice6Icon.x + iconWidth/2, dice6Icon.y + iconWidth);
+
+    FImageButton.render(ctx, dice4Icon);
+    ctx.fillText('4 sided', dice4Icon.x + iconWidth/2, dice4Icon.y + iconWidth);
+
     FImageButton.render(ctx, dice8Icon);
+    ctx.fillText('8 sided', dice8Icon.x + iconWidth/2, dice8Icon.y + iconWidth);
+
     FImageButton.render(ctx, dice10Icon);
+    ctx.fillText('10 sided', dice10Icon.x + iconWidth/2, dice10Icon.y + iconWidth);
+
     FImageButton.render(ctx, dice12Icon);
+    ctx.fillText('12 sided', dice12Icon.x + iconWidth/2, dice12Icon.y + iconWidth);
+
     FImageButton.render(ctx, dice20Icon);
+    ctx.fillText('20 sided', dice20Icon.x + iconWidth/2, dice20Icon.y + iconWidth);
   }
 
   function handleClick(x, y) {
